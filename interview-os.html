@@ -1,0 +1,2519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --surface2: #F0EEE9;
+    --border: rgba(0,0,0,0.08);
+    --border-med: rgba(0,0,0,0.12);
+    --text: #1A1916;
+    --text2: #6B6860;
+    --text3: #A8A59E;
+    --purple: #6C5CE7;
+    --purple-light: #EEE9FF;
+    --purple-mid: #C4B8F8;
+    --purple-dark: #3D2FAA;
+    --green: #00A86B;
+    --green-light: #E0F5EC;
+    --amber: #D4820A;
+    --amber-light: #FEF3DC;
+    --red: #D63B3B;
+    --red-light: #FDEAEA;
+    --teal: #0E8FA1;
+    --teal-light: #E0F6FA;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --sidebar-w: 200px;
+    --font: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --transition: 0.15s ease;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+    z-index: 10;
+  }
+
+  .sidebar-logo {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .sidebar-logo-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .sidebar-logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 1px;
+  }
+
+  .nav-section { padding: 4px 0; }
+  .nav-section-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    padding: 8px 16px 4px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    border-right: 2px solid transparent;
+    transition: all var(--transition);
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active {
+    color: var(--purple);
+    background: var(--purple-light);
+    border-right-color: var(--purple);
+    font-weight: 500;
+  }
+  .nav-item i { font-size: 15px; }
+
+  .nav-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px 4px 36px;
+    font-size: 12px;
+    color: var(--text3);
+    cursor: pointer;
+    transition: color var(--transition);
+  }
+  .nav-sub:hover { color: var(--text2); }
+  .nav-sub.active { color: var(--purple); font-weight: 500; }
+  .nav-sub-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--border-med);
+    flex-shrink: 0;
+  }
+  .nav-sub.active .nav-sub-dot { background: var(--purple); }
+
+  .nav-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 16px;
+  }
+
+  /* ── MAIN CONTENT ── */
+  #main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .topbar {
+    padding: 14px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .topbar-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .topbar-sub {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 1px;
+  }
+  .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+  .page-tabs {
+    display: flex;
+    padding: 0 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .page-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all var(--transition);
+    white-space: nowrap;
+  }
+  .page-tab:hover { color: var(--text); }
+  .page-tab.active {
+    color: var(--purple);
+    border-bottom-color: var(--purple);
+    font-weight: 500;
+  }
+
+  .page-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-med);
+    background: var(--surface);
+    color: var(--text2);
+    transition: all var(--transition);
+  }
+  .btn:hover { background: var(--bg); color: var(--text); }
+  .btn-primary {
+    background: var(--purple);
+    color: white;
+    border-color: var(--purple);
+  }
+  .btn-primary:hover { background: var(--purple-dark); border-color: var(--purple-dark); }
+  .btn-ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--text2);
+  }
+  .btn-ghost:hover { background: var(--bg); }
+  .btn-purple-soft {
+    background: var(--purple-light);
+    color: var(--purple);
+    border-color: var(--purple-mid);
+  }
+  .btn-purple-soft:hover { background: var(--purple-mid); }
+  .btn:disabled { opacity: 0.4; pointer-events: none; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+  }
+  .card-sm { padding: 12px 14px; border-radius: var(--radius); }
+
+  /* ── TAGS ── */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    background: var(--surface2);
+    color: var(--text2);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .tag-purple { background: var(--purple-light); color: var(--purple); border-color: var(--purple-mid); }
+  .tag-green { background: var(--green-light); color: var(--green); border-color: #9FE1CB; }
+  .tag-amber { background: var(--amber-light); color: var(--amber); border-color: #FAC775; }
+  .tag-teal { background: var(--teal-light); color: var(--teal); border-color: #9FE1CB; }
+
+  /* ── STATUS BADGES ── */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+  .status-pending { background: var(--amber-light); color: var(--amber); }
+  .status-advanced { background: var(--green-light); color: var(--green); }
+  .status-offer { background: var(--purple-light); color: var(--purple); }
+  .status-no-offer { background: var(--surface2); color: var(--text2); }
+  .status-withdrew { background: var(--red-light); color: var(--red); }
+
+  /* ── SCORE BARS ── */
+  .score-bar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .score-label { font-size: 12px; color: var(--text2); width: 120px; flex-shrink: 0; }
+  .score-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 99px; background: var(--purple); transition: width 0.6s ease; }
+  .score-val { font-size: 12px; font-weight: 500; color: var(--text); min-width: 24px; text-align: right; }
+
+  /* ── FORM ELEMENTS ── */
+  input, textarea, select {
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border-med);
+    border-radius: var(--radius);
+    padding: 8px 11px;
+    outline: none;
+    width: 100%;
+    transition: border-color var(--transition);
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--purple);
+    box-shadow: 0 0 0 3px rgba(108,92,231,0.08);
+  }
+  input::placeholder, textarea::placeholder { color: var(--text3); }
+  label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; display: block; font-weight: 500; }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border-med);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    background: var(--bg);
+  }
+  .upload-zone:hover { border-color: var(--purple); background: var(--purple-light); }
+  .upload-zone.filled { border-style: solid; border-color: var(--purple-mid); background: var(--purple-light); }
+  .upload-zone i { font-size: 24px; color: var(--text3); display: block; margin-bottom: 6px; }
+  .upload-zone.filled i { color: var(--purple); }
+  .upload-zone-label { font-size: 13px; font-weight: 500; color: var(--text2); }
+  .upload-zone.filled .upload-zone-label { color: var(--purple); }
+  .upload-zone-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  .upload-zone.filled .upload-zone-sub { color: var(--purple-dark); opacity: 0.7; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 32px;
+    color: var(--text3);
+  }
+  .empty-state i { font-size: 36px; margin-bottom: 14px; opacity: 0.4; }
+  .empty-state h3 { font-size: 15px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+  .empty-state p { font-size: 13px; line-height: 1.6; max-width: 280px; }
+
+  /* ── FEEDBACK ITEMS ── */
+  .feedback-item {
+    display: flex;
+    gap: 9px;
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+  .feedback-item i { font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+  .feedback-item p { font-size: 12px; line-height: 1.5; }
+  .fb-warn { background: var(--amber-light); }
+  .fb-warn i, .fb-warn p { color: var(--amber); }
+  .fb-good { background: var(--green-light); }
+  .fb-good i, .fb-good p { color: var(--green); }
+  .fb-info { background: var(--purple-light); }
+  .fb-info i, .fb-info p { color: var(--purple); }
+
+  /* ── MISC ── */
+  .sec-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  /* ── DASHBOARD PAGE ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; }
+  .stat-card-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-card-val { font-size: 28px; font-weight: 500; color: var(--text); letter-spacing: -0.03em; line-height: 1; }
+  .stat-card-sub { font-size: 11px; color: var(--text3); margin-top: 5px; }
+  .stat-card-trend { font-size: 11px; color: var(--green); margin-top: 5px; }
+
+  .pipeline-row { display: flex; gap: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+  .pipe-seg { flex: 1; padding: 14px 16px; border-right: 1px solid var(--border); }
+  .pipe-seg:last-child { border-right: none; }
+  .pipe-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+  .pipe-val { font-size: 24px; font-weight: 500; letter-spacing: -0.02em; }
+
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+
+  /* ── PROFILE PAGE ── */
+  .profile-layout { display: flex; gap: 20px; }
+  .profile-main { flex: 1; min-width: 0; }
+
+  .company-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 14px; }
+  .company-header { display: flex; align-items: center; gap: 12px; padding: 13px 16px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+  .company-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; background: var(--purple-light); color: var(--purple); }
+  .company-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .company-meta { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .company-summary { padding: 12px 16px; font-size: 13px; color: var(--text2); line-height: 1.6; border-bottom: 1px solid var(--border); }
+  .projects-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .project-item { display: flex; flex-direction: column; gap: 6px; }
+  .project-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .project-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .project-metric { font-size: 11px; color: var(--green); background: var(--green-light); padding: 2px 8px; border-radius: 99px; font-weight: 500; }
+  .project-story { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .project-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 2px; }
+  .project-divider { height: 1px; background: var(--border); }
+
+  /* ── ABOUT ME TAB ── */
+  .about-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 18px; margin-bottom: 12px; }
+  .about-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .about-section-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .about-text { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .about-text-editing { width: 100%; resize: vertical; min-height: 80px; font-size: 13px; line-height: 1.7; }
+
+  /* ── FAVORITES TAB ── */
+  .fav-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 10px; }
+  .fav-question { padding: 10px 14px; background: var(--surface2); border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 500; color: var(--text); display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .fav-answer { padding: 12px 14px; font-size: 13px; color: var(--text2); line-height: 1.7; font-style: italic; }
+  .fav-footer { padding: 8px 14px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .fav-company { font-size: 11px; color: var(--text3); }
+  .star-btn { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--amber); padding: 0; flex-shrink: 0; }
+
+  /* ── INTERVIEW PREP PAGE ── */
+  .prep-layout { display: flex; gap: 0; height: 100%; }
+  .prep-left { width: 240px; min-width: 240px; border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; background: var(--surface); }
+  .prep-right { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+  /* ── COMPANY PAGE ── */
+  .company-page-layout { display: flex; flex: 1; overflow: hidden; }
+  .company-page-main { flex: 1; min-width: 0; overflow-y: auto; padding: 20px 24px; }
+  .company-page-side { width: 220px; min-width: 220px; border-left: 1px solid var(--border); overflow-y: auto; padding: 18px; background: var(--surface); display: flex; flex-direction: column; gap: 14px; }
+  .round-selector { display: flex; gap: 8px; margin-bottom: 18px; }
+  .round-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; cursor: pointer; background: var(--surface); transition: all var(--transition); min-width: 130px; }
+  .round-card:hover { border-color: var(--purple-mid); }
+  .round-card.active { border-color: var(--purple); background: var(--purple-light); }
+  .round-card-label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .round-card.active .round-card-label { color: var(--purple); }
+  .round-card-date { font-size: 13px; font-weight: 500; color: var(--text); margin-top: 2px; }
+  .round-card.active .round-card-date { color: var(--purple); }
+  .round-card-who { font-size: 11px; color: var(--text3); }
+
+  .transcript-msg { display: flex; gap: 10px; margin-bottom: 14px; }
+  .transcript-name { font-size: 11px; font-weight: 500; min-width: 60px; padding-top: 2px; flex-shrink: 0; }
+  .transcript-name.me { color: var(--purple); }
+  .transcript-name.them { color: var(--text3); }
+  .transcript-text { font-size: 13px; color: var(--text2); line-height: 1.65; }
+  .transcript-hl { background: var(--amber-light); border-radius: 3px; color: var(--amber); padding: 0 3px; }
+
+  /* ── NEW INTERVIEW PAGE ── */
+  .new-interview-landing { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; max-width: 440px; }
+  .ni-choice-row { display: flex; gap: 10px; width: 100%; }
+  .ni-choice {
+    flex: 1;
+    border: 1.5px solid var(--border-med);
+    border-radius: var(--radius-lg);
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: all var(--transition);
+  }
+  .ni-choice:hover { border-color: var(--purple-mid); background: var(--purple-light); }
+  .ni-choice.selected { border-color: var(--purple); background: var(--purple-light); }
+  .ni-choice i { font-size: 18px; color: var(--text3); flex-shrink: 0; }
+  .ni-choice.selected i { color: var(--purple); }
+  .ni-choice-label { font-size: 13px; font-weight: 500; color: var(--text2); }
+  .ni-choice.selected .ni-choice-label { color: var(--purple); }
+
+  .prep-card-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 11px 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    transition: all var(--transition);
+    margin-bottom: 7px;
+  }
+  .prep-card-item:hover { border-color: var(--purple-mid); background: var(--purple-light); }
+  .prep-card-item-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .prep-card-item-role { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+  /* ── SEARCH PAGE ── */
+  .search-input-wrap { position: relative; margin-bottom: 20px; }
+  .search-input-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--text3); }
+  .search-input-wrap input { padding-left: 38px; font-size: 14px; height: 42px; }
+  .search-filter-row { display: flex; gap: 8px; margin-bottom: 16px; }
+  .search-filter {
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border-med);
+    background: var(--surface);
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: var(--font);
+  }
+  .search-filter:hover { border-color: var(--purple-mid); }
+  .search-filter.active { background: var(--purple-light); color: var(--purple); border-color: var(--purple-mid); font-weight: 500; }
+
+  /* ── DASHBOARD CHART BARS ── */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 90px; padding-bottom: 20px; position: relative; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+  .bar-block { width: 100%; border-radius: 4px 4px 0 0; transition: all 0.4s ease; }
+  .bar-x { font-size: 10px; color: var(--text3); text-align: center; }
+  .bar-score { font-size: 10px; color: var(--text2); }
+
+  .theme-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .theme-name { font-size: 12px; color: var(--text2); width: 130px; flex-shrink: 0; }
+  .theme-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .theme-fill { height: 100%; border-radius: 99px; background: var(--purple); }
+  .theme-count { font-size: 11px; color: var(--text3); min-width: 20px; text-align: right; }
+
+  .verbosity-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+  .verbosity-label { font-size: 11px; color: var(--text2); width: 120px; flex-shrink: 0; }
+  .verbosity-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+  .verbosity-fill { height: 100%; border-radius: 99px; }
+  .verbosity-val { font-size: 11px; color: var(--text3); min-width: 36px; text-align: right; }
+
+  /* dropdown for status */
+  .status-dropdown-wrap { position: relative; display: inline-block; }
+  .status-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border-med);
+    border-radius: var(--radius);
+    overflow: hidden;
+    z-index: 100;
+    min-width: 180px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    display: none;
+  }
+  .status-dropdown-menu.open { display: block; }
+  .status-option {
+    padding: 9px 13px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition);
+  }
+  .status-option:last-child { border-bottom: none; }
+  .status-option:hover { background: var(--bg); }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* modal */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    width: 480px;
+    max-width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    transform: translateY(8px);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-title { font-size: 16px; font-weight: 500; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+
+  /* loading spinner */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--purple-mid);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-med); border-radius: 99px; }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--text);
+    color: white;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    z-index: 300;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* analysis loading state */
+  .analysis-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 48px;
+    text-align: center;
+  }
+  .analysis-loading p { font-size: 13px; color: var(--text2); }
+
+  /* hidden */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">Interview OS</div>
+    <div class="sidebar-logo-sub">Mary's workspace</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-item" onclick="navigate('dashboard')" id="nav-dashboard">
+      <i class="ti ti-layout-dashboard"></i> Dashboard
+    </div>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Prepare</div>
+    <div class="nav-item" onclick="navigate('profile')" id="nav-profile">
+      <i class="ti ti-user"></i> My profile
+    </div>
+    <div class="nav-item" onclick="navigate('prep')" id="nav-prep">
+      <i class="ti ti-clipboard-list"></i> Interview prep
+    </div>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Analyze</div>
+    <div class="nav-item" onclick="navigate('new-interview')" id="nav-new-interview">
+      <i class="ti ti-file-plus"></i> New interview
+    </div>
+    <div class="nav-item" onclick="navigate('search')" id="nav-search">
+      <i class="ti ti-search"></i> Search
+    </div>
+  </div>
+
+  <div class="nav-divider"></div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Interviews</div>
+    <div class="nav-item" onclick="navigate('upcoming')" id="nav-upcoming">
+      <i class="ti ti-calendar-up"></i> Upcoming
+    </div>
+    <div class="nav-item" onclick="navigate('past')" id="nav-past">
+      <i class="ti ti-history"></i> Past interviews
+    </div>
+    <div id="past-companies-list"></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="page-container" style="flex:1;display:flex;flex-direction:column;overflow:hidden;"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA STORE (localStorage)
+// ════════════════════════════════════════
+const DB = {
+  get(key) {
+    try { return JSON.parse(localStorage.getItem('ios_' + key)) || null; }
+    catch { return null; }
+  },
+  set(key, val) {
+    localStorage.setItem('ios_' + key, JSON.stringify(val));
+  },
+  getAll(key) { return this.get(key) || []; }
+};
+
+// ════════════════════════════════════════
+// APP STATE
+// ════════════════════════════════════════
+let currentPage = 'dashboard';
+let currentCompanyId = null;
+let currentRoundIndex = 0;
+let currentProfileTab = 'career';
+let currentPrepTab = 'about';
+let currentCompanyTab = 'transcript';
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function navigate(page, extra = {}) {
+  currentPage = page;
+  if (extra.companyId !== undefined) currentCompanyId = extra.companyId;
+  if (extra.roundIndex !== undefined) currentRoundIndex = extra.roundIndex;
+
+  // update nav active states
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-sub').forEach(el => el.classList.remove('active'));
+
+  const pageToNav = {
+    'dashboard': 'nav-dashboard',
+    'profile': 'nav-profile',
+    'prep': 'nav-prep',
+    'new-interview': 'nav-new-interview',
+    'search': 'nav-search',
+    'upcoming': 'nav-upcoming',
+    'past': 'nav-past',
+    'company': 'nav-past'
+  };
+  const navId = pageToNav[page];
+  if (navId) document.getElementById(navId)?.classList.add('active');
+
+  if (page === 'company' && currentCompanyId) {
+    document.querySelectorAll('.nav-sub').forEach(el => {
+      if (el.dataset.companyId == currentCompanyId) el.classList.add('active');
+    });
+  }
+
+  renderPage();
+  updateSidebarCompanies();
+}
+
+function updateSidebarCompanies() {
+  const interviews = DB.getAll('interviews');
+  const companies = {};
+  interviews.forEach(iv => {
+    if (!companies[iv.companyId]) companies[iv.companyId] = iv;
+  });
+
+  const preps = DB.getAll('preps');
+  preps.forEach(p => {
+    if (!companies[p.id]) companies[p.id] = { companyId: p.id, company: p.company, role: p.role, isPrepOnly: true };
+  });
+
+  const list = document.getElementById('past-companies-list');
+  const sorted = Object.values(companies).sort((a,b) => a.company.localeCompare(b.company));
+
+  if (sorted.length === 0) { list.innerHTML = ''; return; }
+
+  list.innerHTML = sorted.slice(0,8).map(iv => `
+    <div class="nav-sub ${currentCompanyId === iv.companyId ? 'active' : ''}" 
+         data-company-id="${iv.companyId}"
+         onclick="navigate('company', {companyId:'${iv.companyId}'})">
+      <div class="nav-sub-dot"></div>
+      ${iv.company}
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════
+// PAGE RENDERER
+// ════════════════════════════════════════
+function renderPage() {
+  const container = document.getElementById('page-container');
+  switch(currentPage) {
+    case 'dashboard': container.innerHTML = renderDashboard(); break;
+    case 'profile': container.innerHTML = renderProfile(); break;
+    case 'prep': container.innerHTML = renderPrep(); break;
+    case 'new-interview': container.innerHTML = renderNewInterview(); break;
+    case 'search': container.innerHTML = renderSearch(); break;
+    case 'upcoming': container.innerHTML = renderUpcoming(); break;
+    case 'past': container.innerHTML = renderPastList(); break;
+    case 'company': container.innerHTML = renderCompany(); break;
+    default: container.innerHTML = renderDashboard();
+  }
+  bindPageEvents();
+}
+
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
+function renderDashboard() {
+  const interviews = DB.getAll('interviews');
+  const total = interviews.length;
+  const r2plus = interviews.filter(iv => (iv.roundIndex || 0) > 0).length;
+  const r2rate = total > 0 ? Math.round((r2plus / total) * 100) : 0;
+  
+  const withScores = interviews.filter(iv => iv.scores);
+  const avgConcise = withScores.length > 0
+    ? (withScores.reduce((s,iv) => s + (iv.scores.conciseness||0), 0) / withScores.length).toFixed(1)
+    : '—';
+  const avgMetrics = withScores.length > 0
+    ? (withScores.reduce((s,iv) => s + (iv.scores.metricsUse||0), 0) / withScores.length).toFixed(1)
+    : '—';
+
+  const pending = interviews.filter(iv => iv.status === 'pending').length;
+  const advanced = interviews.filter(iv => iv.status === 'advanced').length;
+  const offer = interviews.filter(iv => iv.status === 'offer').length;
+  const noOffer = interviews.filter(iv => iv.status === 'no-offer').length;
+  const withdrew = interviews.filter(iv => iv.status === 'withdrew').length;
+
+  // question themes
+  const allQuestions = interviews.flatMap(iv => iv.questions || []);
+  const themes = {};
+  const themeKeywords = {
+    'Tell me about yourself': ['tell me about yourself', 'walk me through your background'],
+    'Leadership': ['leadership', 'lead', 'manage a team', 'growing a team'],
+    'Design systems': ['design system', 'component', 'token'],
+    'Stakeholders': ['stakeholder', 'executive', 'VP', 'cross-functional'],
+    'Ambiguity': ['ambig', 'unclear', 'uncertain'],
+    'Metrics / data': ['metric', 'data', 'measure', 'analytics'],
+    'Conflict': ['conflict', 'disagree', 'pushback'],
+  };
+  Object.keys(themeKeywords).forEach(theme => {
+    themes[theme] = allQuestions.filter(q =>
+      themeKeywords[theme].some(kw => q.text?.toLowerCase().includes(kw.toLowerCase()))
+    ).length;
+  });
+
+  if (total === 0) {
+    return `
+      <div class="topbar"><div><div class="topbar-title">Dashboard</div></div></div>
+      <div class="page-content">
+        <div class="empty-state" style="margin-top:60px">
+          <i class="ti ti-layout-dashboard"></i>
+          <h3>Your dashboard is empty</h3>
+          <p>Add your first interview to start seeing patterns, scores, and insights here.</p>
+          <div style="margin-top:16px">
+            <button class="btn btn-primary" onclick="navigate('new-interview')"><i class="ti ti-plus"></i> Add an interview</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const barData = withScores.slice(-6).map(iv => ({
+    label: iv.company.slice(0,4),
+    score: iv.scores.conciseness || 0
+  }));
+  const maxScore = 10;
+
+  return `
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-sub">${total} interview${total !== 1 ? 's' : ''} · ${Object.keys(interviews.reduce((a,iv)=>{a[iv.companyId]=1;return a;},{})).length} companies</div>
+      </div>
+    </div>
+    <div class="page-content">
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-card-label">Interviews</div>
+          <div class="stat-card-val">${total}</div>
+          <div class="stat-card-sub">total rounds completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Round 2+ rate</div>
+          <div class="stat-card-val">${r2rate}%</div>
+          <div class="stat-card-trend">${r2plus} advanced</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Avg conciseness</div>
+          <div class="stat-card-val">${avgConcise}</div>
+          <div class="stat-card-sub">target: 8+</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">Avg metrics use</div>
+          <div class="stat-card-val">${avgMetrics}</div>
+          <div class="stat-card-sub">target: 7+</div>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-bottom:8px">Interview pipeline</div>
+      <div class="pipeline-row" style="margin-bottom:20px">
+        <div class="pipe-seg"><div class="pipe-label">Pending</div><div class="pipe-val" style="color:var(--amber)">${pending}</div></div>
+        <div class="pipe-seg"><div class="pipe-label">Advanced</div><div class="pipe-val" style="color:var(--green)">${advanced}</div></div>
+        <div class="pipe-seg"><div class="pipe-label">Offer</div><div class="pipe-val" style="color:var(--purple)">${offer}</div></div>
+        <div class="pipe-seg"><div class="pipe-label">No offer</div><div class="pipe-val" style="color:var(--text3)">${noOffer}</div></div>
+        <div class="pipe-seg"><div class="pipe-label">Withdrew</div><div class="pipe-val" style="color:var(--red)">${withdrew}</div></div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="card">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:14px">Conciseness over time</div>
+          ${barData.length > 0 ? `
+          <div class="bar-chart">
+            ${barData.map(b => `
+              <div class="bar-col">
+                <div class="bar-score">${b.score}</div>
+                <div class="bar-block" style="height:${(b.score/maxScore)*70}px;background:var(--purple);opacity:${0.5 + (b.score/maxScore)*0.5}"></div>
+                <div class="bar-x">${b.label}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="font-size:10px;color:var(--text3);margin-top:8px">Each bar = one interview</div>
+          ` : '<div style="font-size:12px;color:var(--text3);padding:20px 0">Scores will appear after analysis</div>'}
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:14px">Top question themes</div>
+          ${Object.entries(themes).sort((a,b)=>b[1]-a[1]).filter(([,n])=>n>0).map(([theme, count]) => {
+            const maxCount = Math.max(...Object.values(themes), 1);
+            return `
+              <div class="theme-bar-row">
+                <div class="theme-name">${theme}</div>
+                <div class="theme-track"><div class="theme-fill" style="width:${(count/maxCount)*100}%"></div></div>
+                <div class="theme-count">${count}</div>
+              </div>`;
+          }).join('') || '<div style="font-size:12px;color:var(--text3)">Add interviews to see themes</div>'}
+        </div>
+      </div>
+
+      ${withScores.length > 0 ? `
+      <div class="card">
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">Average answer length by question type</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:14px">Target: under 90 seconds</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;">
+          ${[
+            {label:'Tell me about yourself',time:'4m 20s',pct:95,color:'#D85A30'},
+            {label:'Stakeholder questions',time:'3m 10s',pct:78,color:'#D85A30'},
+            {label:'Leadership',time:'2m 45s',pct:65,color:'var(--amber)'},
+            {label:'Ambiguity',time:'2m 05s',pct:50,color:'var(--purple)'},
+            {label:'Design systems',time:'1m 55s',pct:45,color:'var(--purple)'},
+            {label:'Metrics / data',time:'1m 30s',pct:35,color:'var(--green)'},
+            {label:'What excites you',time:'1m 15s',pct:28,color:'var(--green)'},
+            {label:'90-day plan',time:'55s',pct:18,color:'var(--green)'},
+          ].map(r => `
+            <div class="verbosity-row">
+              <div class="verbosity-label">${r.label}</div>
+              <div class="verbosity-track"><div class="verbosity-fill" style="width:${r.pct}%;background:${r.color}"></div></div>
+              <div class="verbosity-val">${r.time}</div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex;gap:14px;margin-top:12px;flex-wrap:wrap">
+          <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:#D85A30;display:inline-block"></span>Over 3 min</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:var(--amber);display:inline-block"></span>2–3 min</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:var(--purple);display:inline-block"></span>1–2 min</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)"><span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>Under 90s ✓</span>
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// PROFILE PAGE
+// ════════════════════════════════════════
+function renderProfile() {
+  const tabs = [
+    {id:'career', label:'Career history'},
+    {id:'about', label:'About me'},
+    {id:'favorites', label:'Favorites'},
+  ];
+
+  let tabContent = '';
+  if (currentProfileTab === 'career') tabContent = renderCareerHistory();
+  else if (currentProfileTab === 'about') tabContent = renderAboutMe();
+  else if (currentProfileTab === 'favorites') tabContent = renderFavorites();
+
+  return `
+    <div class="topbar">
+      <div><div class="topbar-title">My profile</div><div class="topbar-sub">Your career source of truth</div></div>
+    </div>
+    <div class="page-tabs">
+      ${tabs.map(t => `<div class="page-tab ${currentProfileTab===t.id?'active':''}" onclick="setProfileTab('${t.id}')">${t.label}</div>`).join('')}
+    </div>
+    <div class="page-content">${tabContent}</div>`;
+}
+
+function renderCareerHistory() {
+  const companies = DB.getAll('profile-companies');
+  if (companies.length === 0) {
+    return `
+      <div class="empty-state">
+        <i class="ti ti-building"></i>
+        <h3>No companies yet</h3>
+        <p>Add the companies you've worked at to build your career history.</p>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" onclick="openAddCompanyModal()"><i class="ti ti-plus"></i> Add a company</button>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+      <button class="btn btn-primary" onclick="openAddCompanyModal()"><i class="ti ti-plus"></i> Add company</button>
+    </div>
+    ${companies.map(co => renderCompanyBlock(co)).join('')}`;
+}
+
+function renderCompanyBlock(co) {
+  const colors = ['#6C5CE7','#00A86B','#D4820A','#0E8FA1','#D63B3B'];
+  const colorIdx = Math.abs(co.name.charCodeAt(0)) % colors.length;
+  const color = colors[colorIdx];
+  const initials = co.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+  return `
+    <div class="company-block">
+      <div class="company-header">
+        <div class="company-avatar" style="background:${color}20;color:${color}">${initials}</div>
+        <div style="flex:1">
+          <div class="company-name">${co.name}</div>
+          <div class="company-meta">${co.dates} · ${co.title}${co.industry ? ' · ' + co.industry : ''}</div>
+        </div>
+        <button class="btn btn-ghost" onclick="openEditCompanyModal('${co.id}')" style="font-size:13px;padding:5px 8px"><i class="ti ti-edit"></i></button>
+      </div>
+      ${co.summary ? `<div class="company-summary">${co.summary}</div>` : ''}
+      <div class="projects-list">
+        ${(co.projects || []).map((proj, pi) => `
+          ${pi > 0 ? '<div class="project-divider"></div>' : ''}
+          <div class="project-item">
+            <div class="project-header">
+              <div class="project-name">${proj.name}</div>
+              ${proj.metric ? `<span class="project-metric">${proj.metric}</span>` : ''}
+            </div>
+            ${proj.story ? `<div class="project-story">${proj.story}</div>` : ''}
+            <div class="project-tags">
+              ${(proj.tags || []).map(t => `<span class="tag ${getTagColor(t)}">${t}</span>`).join('')}
+            </div>
+          </div>
+        `).join('')}
+        <button class="btn btn-ghost" onclick="openAddProjectModal('${co.id}')" style="font-size:12px;padding:4px 0;color:var(--purple)">
+          <i class="ti ti-plus"></i> Add project
+        </button>
+      </div>
+    </div>`;
+}
+
+function getTagColor(tag) {
+  const purpleTags = ['design systems','leadership','strategy','director'];
+  const greenTags = ['research','usability','metrics','data'];
+  const amberTags = ['stakeholders','process','roi','cross-functional'];
+  tag = tag.toLowerCase();
+  if (purpleTags.some(t => tag.includes(t))) return 'tag-purple';
+  if (greenTags.some(t => tag.includes(t))) return 'tag-green';
+  if (amberTags.some(t => tag.includes(t))) return 'tag-amber';
+  return '';
+}
+
+function renderAboutMe() {
+  const prompts = DB.getAll('about-prompts');
+  const defaultPrompts = [
+    {id:'looking', question:"What I'm looking for in my next role", answer:''},
+    {id:'excites', question:"What excites me about design", answer:''},
+    {id:'engineering', question:"How I work with engineering", answer:''},
+    {id:'ambiguity', question:"How I handle ambiguity", answer:''},
+  ];
+  const allPrompts = defaultPrompts.map(dp => {
+    const saved = prompts.find(p => p.id === dp.id);
+    return saved || dp;
+  }).concat(prompts.filter(p => !defaultPrompts.find(dp => dp.id === p.id)));
+
+  return `
+    ${allPrompts.map(p => `
+      <div class="about-section" id="about-${p.id}">
+        <div class="about-section-header">
+          <div class="about-section-title">${p.question}</div>
+          <button class="btn btn-ghost" onclick="toggleEditAbout('${p.id}')" style="font-size:12px;padding:4px 8px">
+            <i class="ti ti-edit"></i> Edit
+          </button>
+        </div>
+        <div id="about-display-${p.id}">
+          ${p.answer ? `<div class="about-text">${p.answer}</div>` : `<div style="font-size:13px;color:var(--text3);font-style:italic">Click edit to add your answer…</div>`}
+        </div>
+        <div id="about-edit-${p.id}" class="hidden">
+          <textarea class="about-text-editing" id="about-textarea-${p.id}" placeholder="Write your answer…">${p.answer || ''}</textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-primary" onclick="saveAbout('${p.id}','${p.question}')">Save</button>
+            <button class="btn" onclick="toggleEditAbout('${p.id}')">Cancel</button>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+    <button class="btn" onclick="openAddPromptModal()" style="margin-top:4px"><i class="ti ti-plus"></i> Add a prompt</button>`;
+}
+
+function renderFavorites() {
+  const favorites = DB.getAll('favorites');
+  if (favorites.length === 0) {
+    return `
+      <div class="empty-state">
+        <i class="ti ti-star"></i>
+        <h3>No favorites yet</h3>
+        <p>Star questions and answers from your interview transcripts to save them here.</p>
+      </div>`;
+  }
+  return favorites.map(fav => `
+    <div class="fav-item">
+      <div class="fav-question">
+        <span>${fav.question}</span>
+        <button class="star-btn" onclick="removeFavorite('${fav.id}')"><i class="ti ti-star-filled"></i></button>
+      </div>
+      <div class="fav-answer">"${fav.answer}"</div>
+      <div class="fav-footer">
+        ${fav.scores ? `<span class="tag tag-purple">conciseness ${fav.scores.conciseness}/10</span>` : ''}
+        <span class="fav-company">${fav.company} · ${fav.date || ''}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════
+// INTERVIEW PREP PAGE
+// ════════════════════════════════════════
+function renderPrep() {
+  const preps = DB.getAll('preps');
+  const tabs = [
+    {id:'about', label:'About me'},
+    {id:'questions', label:'Best questions to ask'},
+    {id:'projects', label:'Relevant projects'},
+  ];
+
+  return `
+    <div class="topbar">
+      <div><div class="topbar-title">Interview prep</div><div class="topbar-sub">Paste a job description · get your brief</div></div>
+    </div>
+    <div style="flex:1;display:flex;overflow:hidden;">
+      <div class="prep-left">
+        <div>
+          <label>Job description</label>
+          <div id="jd-upload-zone" class="upload-zone" onclick="triggerFileUpload('jd-file')">
+            <i class="ti ti-clipboard-text"></i>
+            <div class="upload-zone-label">Paste or drop JD here</div>
+            <div class="upload-zone-sub">or click to upload</div>
+          </div>
+          <input type="file" id="jd-file" accept=".txt,.pdf,.docx" class="hidden" onchange="handleJDUpload(event)">
+          <textarea id="jd-text" placeholder="Or paste the job description here…" style="margin-top:8px;height:100px;resize:vertical;font-size:12px;" oninput="updatePrepJD()"></textarea>
+        </div>
+        <div>
+          <label>Company URL <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+          <input type="text" id="prep-url" placeholder="company.com" style="font-size:12px">
+        </div>
+        <div>
+          <label>Company name</label>
+          <input type="text" id="prep-company" placeholder="e.g. Stripe" style="font-size:12px">
+        </div>
+        <div>
+          <label>Role</label>
+          <input type="text" id="prep-role" placeholder="e.g. Director of Product Design" style="font-size:12px">
+        </div>
+        <button class="btn btn-primary" onclick="generatePrepBrief()" style="width:100%">
+          <i class="ti ti-player-play"></i> Generate brief
+        </button>
+        ${preps.length > 0 ? `
+          <div class="divider"></div>
+          <div class="sec-label">Saved preps</div>
+          ${preps.slice(0,5).map(p => `
+            <div class="card card-sm" style="cursor:pointer;margin-bottom:6px" onclick="loadPrep('${p.id}')">
+              <div style="font-size:12px;font-weight:500;color:var(--text)">${p.company}</div>
+              <div style="font-size:11px;color:var(--text3)">${p.role}</div>
+            </div>
+          `).join('')}
+        ` : ''}
+      </div>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;">
+        <div class="page-tabs">
+          ${tabs.map(t => `<div class="page-tab ${currentPrepTab===t.id?'active':''}" onclick="setPrepTab('${t.id}')">${t.label}</div>`).join('')}
+        </div>
+        <div class="page-content" id="prep-tab-content">
+          ${renderPrepTabContent()}
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderPrepTabContent() {
+  const currentPrep = DB.get('current-prep');
+  if (!currentPrep) {
+    return `
+      <div class="empty-state">
+        <i class="ti ti-clipboard-list"></i>
+        <h3>Your brief will appear here</h3>
+        <p>Fill in the job description on the left and hit "Generate brief" to get your tailored about me, best questions, and relevant projects.</p>
+      </div>`;
+  }
+
+  if (currentPrepTab === 'about') {
+    return `
+      <div style="background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:0.05em;font-weight:500;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+          <i class="ti ti-sparkles" style="font-size:13px"></i> Tailored to this role
+        </div>
+        <div style="font-size:13px;color:var(--purple-dark);line-height:1.7" id="prep-about-text">${currentPrep.about || ''}</div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-purple-soft" onclick="editPrepAbout()"><i class="ti ti-edit"></i> Edit</button>
+          <button class="btn btn-purple-soft" onclick="generatePrepBrief()"><i class="ti ti-refresh"></i> Regenerate</button>
+          <button class="btn btn-purple-soft" onclick="savePrepAbout()" style="margin-left:auto"><i class="ti ti-bookmark"></i> Save prep</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3)">Pulled from your career history · edit freely before your interview</div>`;
+  }
+
+  if (currentPrepTab === 'questions') {
+    const questions = currentPrep.questions || [];
+    return `
+      <div class="sec-label" style="margin-bottom:8px">Suggested for this role</div>
+      ${questions.map((q,i) => `
+        <div class="card card-sm" style="margin-bottom:8px;display:flex;align-items:flex-start;gap:10px">
+          <div style="font-size:13px;color:var(--text);flex:1;line-height:1.5">${q}</div>
+          <button class="btn btn-ghost" style="padding:4px;font-size:14px;color:var(--amber)" title="Star this question">
+            <i class="ti ti-star"></i>
+          </button>
+        </div>
+      `).join('')}`;
+  }
+
+  if (currentPrepTab === 'projects') {
+    const projects = currentPrep.projects || [];
+    const companies = DB.getAll('profile-companies');
+    const allProjects = companies.flatMap(co =>
+      (co.projects||[]).map(p => ({...p, company: co.name}))
+    );
+    return `
+      ${allProjects.length === 0
+        ? `<div class="empty-state"><i class="ti ti-layers"></i><h3>No projects in your profile</h3><p>Add companies and projects to your profile to get relevant project suggestions here.</p></div>`
+        : allProjects.map(p => `
+          <div class="card card-sm" style="margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <div style="font-size:13px;font-weight:500;color:var(--text)">${p.name}</div>
+              ${p.metric ? `<span class="project-metric">${p.metric}</span>` : ''}
+              <span style="font-size:11px;color:var(--text3);margin-left:auto">${p.company}</span>
+            </div>
+            ${p.story ? `<div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:6px">${p.story}</div>` : ''}
+            <div class="project-tags">${(p.tags||[]).map(t=>`<span class="tag ${getTagColor(t)}">${t}</span>`).join('')}</div>
+          </div>
+        `).join('')
+      }`;
+  }
+}
+
+// ════════════════════════════════════════
+// NEW INTERVIEW PAGE
+// ════════════════════════════════════════
+let niState = 'landing'; // 'landing' | 'prep-selected' | 'upload'
+let niSelectedPrep = null;
+let niUploadedTranscript = null;
+let niUploadedJD = null;
+
+function renderNewInterview() {
+  niState = niState || 'landing';
+  const preps = DB.getAll('preps');
+
+  if (niState === 'landing') {
+    return `
+      <div class="topbar"><div class="topbar-title">New interview</div></div>
+      <div class="page-content">
+        <div class="new-interview-landing">
+          <div class="ni-choice-row">
+            <div class="ni-choice selected" id="ni-prep-btn" onclick="selectNIMode('prep')">
+              <i class="ti ti-clipboard-list"></i>
+              <div class="ni-choice-label">Connect to an interview prep</div>
+            </div>
+            <div class="ni-choice" id="ni-upload-btn" onclick="selectNIMode('upload')">
+              <i class="ti ti-upload"></i>
+              <div class="ni-choice-label">Upload files</div>
+            </div>
+          </div>
+          ${preps.length > 0 ? `
+            <div style="width:100%">
+              <div class="sec-label">Your interview preps</div>
+              <div id="prep-cards-list">
+                ${preps.map(p => `
+                  <div class="prep-card-item" onclick="selectPrep('${p.id}')">
+                    <div>
+                      <div class="prep-card-item-name">${p.company}</div>
+                      <div class="prep-card-item-role">${p.role}</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <span class="tag tag-green">Round ${getNextRound(p.id)}</span>
+                      <i class="ti ti-chevron-right" style="font-size:14px;color:var(--text3)"></i>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : `
+            <div style="width:100%">
+              <div class="sec-label">Your interview preps</div>
+              <div class="card" style="text-align:center;padding:24px;color:var(--text3)">
+                <i class="ti ti-clipboard-list" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>
+                <div style="font-size:13px">No interview preps yet</div>
+                <div style="font-size:12px;margin-top:4px">Create one in <a href="#" onclick="navigate('prep')" style="color:var(--purple)">Interview prep</a></div>
+              </div>
+            </div>
+          `}
+        </div>
+      </div>`;
+  }
+
+  if (niState === 'prep-selected' && niSelectedPrep) {
+    const prep = preps.find(p => p.id === niSelectedPrep);
+    const nextRound = getNextRound(niSelectedPrep);
+    const prevInterviews = DB.getAll('interviews').filter(iv => iv.companyId === niSelectedPrep);
+
+    return `
+      <div class="topbar">
+        <button class="btn btn-ghost" onclick="resetNI()" style="padding:5px 8px"><i class="ti ti-arrow-left"></i></button>
+        <div>
+          <div class="topbar-title">${prep.company} · Round ${nextRound}</div>
+          <div class="topbar-sub">${prep.role}</div>
+        </div>
+      </div>
+      <div class="page-content" style="max-width:500px">
+        <div style="background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:20px">
+          <div style="font-size:12px;font-weight:500;color:var(--purple);margin-bottom:8px;display:flex;align-items:center;gap:6px">
+            <i class="ti ti-clipboard-list" style="font-size:13px"></i> Your prep for this interview
+          </div>
+          <div style="font-size:12px;color:var(--purple-dark);display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;gap:6px"><i class="ti ti-check" style="font-size:13px"></i> Job description pulled in</div>
+            <div style="display:flex;align-items:center;gap:6px"><i class="ti ti-check" style="font-size:13px"></i> Your tailored about me + questions ready</div>
+            ${prevInterviews.length > 0 ? `<div style="display:flex;align-items:center;gap:6px"><i class="ti ti-check" style="font-size:13px"></i> ${prevInterviews.length} prior round${prevInterviews.length>1?'s':''} pulled in for progression analysis</div>` : ''}
+          </div>
+        </div>
+
+        <div id="ni-transcript-zone" class="upload-zone ${niUploadedTranscript?'filled':''}" 
+             onclick="triggerFileUpload('ni-transcript-file')" style="padding:36px 20px">
+          <i class="ti ${niUploadedTranscript?'ti-check':'ti-file-text'}"></i>
+          <div class="upload-zone-label">${niUploadedTranscript ? niUploadedTranscript.name : 'Upload your interview transcript'}</div>
+          <div class="upload-zone-sub">${niUploadedTranscript ? 'click to replace' : 'drop or click · .txt or .docx'}</div>
+        </div>
+        <input type="file" id="ni-transcript-file" accept=".txt,.docx" class="hidden" onchange="handleNITranscript(event)">
+
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px">
+          <div>
+            <label>Date of interview</label>
+            <input type="date" id="ni-date" style="font-size:13px">
+          </div>
+          <div>
+            <label>Interviewers</label>
+            <div id="interviewers-list">
+              <div class="interviewer-row-input" style="display:flex;gap:8px;margin-bottom:6px">
+                <input type="text" placeholder="Name · title" style="flex:1;font-size:12px" class="ni-interviewer-name">
+                <input type="text" placeholder="linkedin.com/in/…" style="width:160px;font-size:12px" class="ni-interviewer-li">
+              </div>
+            </div>
+            <button class="btn btn-ghost" onclick="addInterviewerRow()" style="font-size:12px;padding:4px 0;color:var(--purple)">
+              <i class="ti ti-plus"></i> Add interviewer
+            </button>
+          </div>
+          <div>
+            <label>Outcome</label>
+            <div class="pill-group" id="ni-status-group">
+              ${['pending','advanced','offer','no-offer','withdrew'].map(s => `
+                <button class="tag ${s==='pending'?'tag-amber':''}" 
+                        style="padding:5px 12px;cursor:pointer;font-size:12px"
+                        onclick="selectNIStatus('${s}')" 
+                        id="ni-status-${s}">${s.charAt(0).toUpperCase()+s.slice(1).replace('-',' ')}</button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;display:flex;gap:10px">
+          <button class="btn btn-primary ${!niUploadedTranscript?'':'ready'}" 
+                  id="ni-analyze-btn"
+                  ${!niUploadedTranscript?'disabled':''} 
+                  onclick="analyzeInterview()">
+            <i class="ti ti-player-play"></i> Save + analyze
+          </button>
+          <button class="btn" onclick="saveInterviewOnly()">
+            <i class="ti ti-device-floppy"></i> Save without analyzing
+          </button>
+        </div>
+      </div>`;
+  }
+
+  if (niState === 'upload') {
+    return `
+      <div class="topbar">
+        <button class="btn btn-ghost" onclick="resetNI()" style="padding:5px 8px"><i class="ti ti-arrow-left"></i></button>
+        <div class="topbar-title">New interview · upload files</div>
+      </div>
+      <div class="page-content" style="max-width:500px">
+        <div class="ni-choice-row" style="margin-bottom:24px">
+          <div class="ni-choice" onclick="selectNIMode('prep')">
+            <i class="ti ti-clipboard-list"></i>
+            <div class="ni-choice-label">Connect to an interview prep</div>
+          </div>
+          <div class="ni-choice selected">
+            <i class="ti ti-upload" style="color:var(--purple)"></i>
+            <div class="ni-choice-label" style="color:var(--purple)">Upload files</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <div style="flex:1">
+            <label>Job description <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+            <div id="ni-jd-zone" class="upload-zone ${niUploadedJD?'filled':''}" onclick="triggerFileUpload('ni-jd-file')" style="padding:28px 14px">
+              <i class="ti ${niUploadedJD?'ti-check':'ti-file-description'}"></i>
+              <div class="upload-zone-label">${niUploadedJD ? niUploadedJD.name : 'Job description'}</div>
+              <div class="upload-zone-sub">${niUploadedJD ? 'click to replace' : 'optional · drop or click'}</div>
+            </div>
+            <input type="file" id="ni-jd-file" accept=".txt,.pdf,.docx" class="hidden" onchange="handleNIJD(event)">
+          </div>
+          <div style="flex:1">
+            <label>Transcript</label>
+            <div id="ni-upload-transcript-zone" class="upload-zone ${niUploadedTranscript?'filled':''}" onclick="triggerFileUpload('ni-upload-transcript-file')" style="padding:28px 14px">
+              <i class="ti ${niUploadedTranscript?'ti-check':'ti-file-text'}"></i>
+              <div class="upload-zone-label">${niUploadedTranscript ? niUploadedTranscript.name : 'Transcript'}</div>
+              <div class="upload-zone-sub">${niUploadedTranscript ? 'click to replace' : 'drop or click to upload'}</div>
+            </div>
+            <input type="file" id="ni-upload-transcript-file" accept=".txt,.docx" class="hidden" onchange="handleNITranscriptUpload(event)">
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+          <div style="display:flex;gap:10px">
+            <div style="flex:1">
+              <label>Company</label>
+              <input type="text" id="ni-upload-company" placeholder="e.g. Stripe" style="font-size:12px">
+            </div>
+            <div style="flex:1">
+              <label>Role</label>
+              <input type="text" id="ni-upload-role" placeholder="e.g. Director of Product Design" style="font-size:12px">
+            </div>
+          </div>
+          <div>
+            <label>Date of interview</label>
+            <input type="date" id="ni-upload-date" style="font-size:13px">
+          </div>
+          <div>
+            <label>Interviewers</label>
+            <div id="upload-interviewers-list">
+              <div style="display:flex;gap:8px;margin-bottom:6px">
+                <input type="text" placeholder="Name · title" style="flex:1;font-size:12px" class="ni-interviewer-name">
+                <input type="text" placeholder="linkedin.com/in/…" style="width:160px;font-size:12px" class="ni-interviewer-li">
+              </div>
+            </div>
+            <button class="btn btn-ghost" onclick="addInterviewerRowUpload()" style="font-size:12px;padding:4px 0;color:var(--purple)">
+              <i class="ti ti-plus"></i> Add interviewer
+            </button>
+          </div>
+          <div>
+            <label>Outcome</label>
+            <div class="pill-group">
+              ${['pending','advanced','offer','no-offer','withdrew'].map(s => `
+                <button class="tag ${s==='pending'?'tag-amber':''}" 
+                        style="padding:5px 12px;cursor:pointer;font-size:12px"
+                        onclick="selectNIStatus('${s}')"
+                        id="ni-status-${s}">${s.charAt(0).toUpperCase()+s.slice(1).replace('-',' ')}</button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" ${!niUploadedTranscript?'disabled':''} onclick="analyzeInterviewUpload()">
+          <i class="ti ti-player-play"></i> Save + analyze
+        </button>
+      </div>`;
+  }
+}
+
+function getNextRound(companyId) {
+  const interviews = DB.getAll('interviews').filter(iv => iv.companyId === companyId);
+  return interviews.length + 1;
+}
+
+// ════════════════════════════════════════
+// PAST INTERVIEWS LIST
+// ════════════════════════════════════════
+function renderPastList() {
+  const interviews = DB.getAll('interviews');
+  const byCompany = {};
+  interviews.forEach(iv => {
+    if (!byCompany[iv.companyId]) byCompany[iv.companyId] = [];
+    byCompany[iv.companyId].push(iv);
+  });
+
+  if (interviews.length === 0) {
+    return `
+      <div class="topbar"><div class="topbar-title">Past interviews</div></div>
+      <div class="page-content">
+        <div class="empty-state">
+          <i class="ti ti-history"></i>
+          <h3>No interviews yet</h3>
+          <p>Add your first interview to start tracking your progress.</p>
+          <div style="margin-top:16px">
+            <button class="btn btn-primary" onclick="navigate('new-interview')"><i class="ti ti-plus"></i> Add an interview</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const companies = Object.keys(byCompany);
+
+  return `
+    <div class="topbar">
+      <div><div class="topbar-title">Past interviews</div><div class="topbar-sub">${interviews.length} interviews · ${companies.length} companies</div></div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary" onclick="navigate('new-interview')"><i class="ti ti-plus"></i> Add interview</button>
+      </div>
+    </div>
+    <div class="page-content">
+      ${companies.map(cid => {
+        const rounds = byCompany[cid].sort((a,b) => (a.roundIndex||0) - (b.roundIndex||0));
+        const latest = rounds[rounds.length - 1];
+        const initials = latest.company.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+        const colors = ['#6C5CE7','#00A86B','#D4820A','#0E8FA1','#D63B3B'];
+        const color = colors[Math.abs(latest.company.charCodeAt(0)) % colors.length];
+
+        return `
+          <div class="card" style="margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px" 
+               onclick="navigate('company',{companyId:'${cid}'})">
+            <div class="company-avatar" style="background:${color}20;color:${color};width:36px;height:36px;font-size:13px">${initials}</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:500;color:var(--text)">${latest.company}</div>
+              <div style="font-size:12px;color:var(--text3)">${latest.role} · ${rounds.length} round${rounds.length>1?'s':''}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="status-badge status-${latest.status||'pending'}">${statusLabel(latest.status)}</span>
+              <i class="ti ti-chevron-right" style="font-size:15px;color:var(--text3)"></i>
+            </div>
+          </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function statusLabel(s) {
+  const map = {'pending':'Pending','advanced':'Advanced','offer':'Offer','no-offer':'No offer','withdrew':'Withdrew'};
+  return map[s] || 'Pending';
+}
+
+// ════════════════════════════════════════
+// COMPANY PAGE
+// ════════════════════════════════════════
+function renderCompany() {
+  const interviews = DB.getAll('interviews').filter(iv => iv.companyId === currentCompanyId);
+  if (interviews.length === 0) { navigate('past'); return ''; }
+
+  const sorted = interviews.sort((a,b) => (a.roundIndex||0)-(b.roundIndex||0));
+  const current = sorted[currentRoundIndex] || sorted[0];
+  const tabs = [
+    {id:'transcript', label:'Transcript'},
+    {id:'jd', label:'Job description'},
+    {id:'retrospective', label:'Retrospective'},
+  ];
+  const initials = current.company.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  const colors = ['#6C5CE7','#00A86B','#D4820A','#0E8FA1','#D63B3B'];
+  const color = colors[Math.abs(current.company.charCodeAt(0)) % colors.length];
+
+  return `
+    <div class="topbar">
+      <button class="btn btn-ghost" onclick="navigate('past')" style="padding:5px 8px"><i class="ti ti-arrow-left"></i></button>
+      <div class="company-avatar" style="background:${color}20;color:${color}">${initials}</div>
+      <div style="flex:1">
+        <div class="topbar-title">${current.company}</div>
+        <div class="topbar-sub">${current.role} · ${sorted.length} round${sorted.length>1?'s':''}</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="status-dropdown-wrap">
+          <div class="status-badge status-${current.status||'pending'}" onclick="toggleStatusDropdown('${current.id}')">
+            <i class="ti ti-chevron-down" style="font-size:11px"></i>
+            ${statusLabel(current.status)}
+          </div>
+          <div class="status-dropdown-menu" id="status-dropdown-${current.id}">
+            ${[
+              {val:'pending',label:'Pending',color:'var(--amber)'},
+              {val:'advanced',label:'Advanced',color:'var(--green)'},
+              {val:'offer',label:'Offer received',color:'var(--purple)'},
+              {val:'no-offer',label:'No offer',color:'var(--text3)'},
+              {val:'withdrew',label:'Withdrew',color:'var(--red)'},
+            ].map(s => `
+              <div class="status-option" onclick="setStatus('${current.id}','${s.val}')">
+                <div class="status-dot" style="background:${s.color}"></div>
+                ${s.label}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:12px 24px;border-bottom:1px solid var(--border);background:var(--surface);display:flex;gap:10px;overflow-x:auto">
+      ${sorted.map((iv, i) => `
+        <div class="round-card ${i===currentRoundIndex?'active':''}" onclick="setRound(${i})">
+          <div class="round-card-label">Round ${i+1}</div>
+          <div class="round-card-date">${iv.date || 'Date not set'}</div>
+          <div class="round-card-who">${iv.interviewers?.[0]?.name || 'Interviewer not set'}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="page-tabs">
+      ${tabs.map(t => `<div class="page-tab ${currentCompanyTab===t.id?'active':''}" onclick="setCompanyTab('${t.id}')">${t.label}</div>`).join('')}
+    </div>
+
+    <div style="flex:1;display:flex;overflow:hidden;">
+      <div class="page-content" style="flex:1;min-width:0" id="company-tab-content">
+        ${renderCompanyTabContent(current)}
+      </div>
+      <div class="company-page-side">
+        ${renderCompanySidePanel(current)}
+      </div>
+    </div>`;
+}
+
+function renderCompanyTabContent(iv) {
+  if (currentCompanyTab === 'transcript') {
+    if (!iv.transcript) {
+      return `<div class="empty-state"><i class="ti ti-file-text"></i><h3>No transcript</h3><p>Transcript was not uploaded for this round.</p></div>`;
+    }
+    const lines = iv.transcript.split('\n').filter(l => l.trim());
+    return lines.map(line => {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 30) {
+        const speaker = line.slice(0, colonIdx).trim();
+        const text = line.slice(colonIdx+1).trim();
+        const isMe = speaker.toLowerCase() === 'mary' || speaker.toLowerCase() === 'me';
+        return `
+          <div class="transcript-msg">
+            <div class="transcript-name ${isMe?'me':'them'}">${speaker}</div>
+            <div class="transcript-text">${text}</div>
+          </div>`;
+      }
+      return `<div class="transcript-msg"><div class="transcript-text" style="color:var(--text2)">${line}</div></div>`;
+    }).join('');
+  }
+
+  if (currentCompanyTab === 'jd') {
+    if (!iv.jobDescription) {
+      return `<div class="empty-state"><i class="ti ti-file-description"></i><h3>No job description</h3><p>No job description was uploaded for this interview.</p></div>`;
+    }
+    return `<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-wrap">${iv.jobDescription}</div>`;
+  }
+
+  if (currentCompanyTab === 'retrospective') {
+    if (!iv.analysis) {
+      return `<div class="empty-state"><i class="ti ti-chart-bar"></i><h3>No analysis yet</h3><p>Run analysis on this interview to see detailed feedback here.</p><div style="margin-top:14px"><button class="btn btn-primary" onclick="runAnalysisOnExisting()"><i class="ti ti-player-play"></i> Analyze this interview</button></div></div>`;
+    }
+
+    return `
+      <div style="background:var(--purple-light);border:1px solid var(--purple-mid);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--purple);font-weight:500;margin-bottom:7px;display:flex;align-items:center;gap:5px">
+          <i class="ti ti-sparkles" style="font-size:13px"></i> AI summary
+        </div>
+        <div style="font-size:13px;color:var(--purple-dark);line-height:1.7">${iv.analysis.summary || ''}</div>
+      </div>
+
+      <div class="sec-label">Question by question</div>
+      ${(iv.questions||[]).map(q => `
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px">
+          <div style="padding:9px 12px;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px">
+            <div style="font-size:13px;color:var(--text);font-weight:500;flex:1">${q.text}</div>
+            ${q.flag ? `<span class="tag tag-amber" style="white-space:nowrap">${q.flag}</span>` : ''}
+            ${q.good ? `<span class="tag tag-green" style="white-space:nowrap">${q.good}</span>` : ''}
+            <button class="star-btn" onclick="favoriteQA('${iv.id}','${q.text?.replace(/'/g,"\\'")}','${q.myAnswer?.replace(/'/g,"\\'") || ''}','${iv.company}','${iv.date||''}')" title="Add to favorites" style="font-size:14px;color:var(--text3)">
+              <i class="ti ti-star"></i>
+            </button>
+          </div>
+          ${q.feedback ? `<div style="padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.5">${q.feedback}</div>` : ''}
+        </div>
+      `).join('')}`;
+  }
+}
+
+function renderCompanySidePanel(iv) {
+  if (!iv.scores) {
+    return `
+      <div class="sec-label">Analysis</div>
+      <div style="font-size:12px;color:var(--text3);line-height:1.6">Run analysis to see scores and patterns here.</div>`;
+  }
+
+  const scoreKeys = [
+    {key:'conciseness', label:'Conciseness'},
+    {key:'metricsUse', label:'Metrics use'},
+    {key:'alignment', label:'Role alignment'},
+    {key:'directorFraming', label:'Director framing'},
+    {key:'questionAnswered', label:'Q answered'},
+    {key:'businessFraming', label:'Business framing'},
+  ];
+
+  return `
+    <div>
+      <div class="sec-label">Scores</div>
+      ${scoreKeys.filter(sk => iv.scores[sk.key] !== undefined).map(sk => `
+        <div class="score-bar-wrap">
+          <div class="score-label">${sk.label}</div>
+          <div class="score-track"><div class="score-fill" style="width:${(iv.scores[sk.key]/10)*100}%"></div></div>
+          <div class="score-val">${iv.scores[sk.key]}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="sec-label">Patterns spotted</div>
+      ${(iv.analysis?.patterns || []).map(p => `
+        <div class="feedback-item ${p.type==='warn'?'fb-warn':p.type==='good'?'fb-good':'fb-info'}" style="margin-bottom:7px">
+          <i class="ti ${p.type==='warn'?'ti-alert-triangle':p.type==='good'?'ti-check':'ti-bulb'}"></i>
+          <p>${p.text}</p>
+        </div>
+      `).join('')}
+    </div>
+    ${iv.analysis?.avgAnswerLength ? `
+      <div class="divider"></div>
+      <div class="sec-label">Stats</div>
+      <div class="card card-sm" style="margin-bottom:8px">
+        <div style="font-size:10px;color:var(--text3)">Avg answer length</div>
+        <div style="font-size:18px;font-weight:500;color:var(--text)">${iv.analysis.avgAnswerLength}</div>
+        <div style="font-size:10px;color:var(--text3)">Target: under 90 sec</div>
+      </div>
+    ` : ''}`;
+}
+
+// ════════════════════════════════════════
+// SEARCH PAGE
+// ════════════════════════════════════════
+function renderSearch() {
+  return `
+    <div class="topbar"><div class="topbar-title">Search</div></div>
+    <div class="page-content">
+      <div class="search-input-wrap">
+        <i class="ti ti-search"></i>
+        <input type="text" id="search-input" placeholder="Search…" oninput="runSearch()" autofocus>
+      </div>
+      <div class="search-filter-row">
+        <button class="search-filter active" onclick="setSearchFilter('all',this)">All</button>
+        <button class="search-filter" onclick="setSearchFilter('questions',this)">Questions</button>
+        <button class="search-filter" onclick="setSearchFilter('answers',this)">Answers</button>
+        <button class="search-filter" onclick="setSearchFilter('profile',this)">Profile</button>
+      </div>
+      <div id="search-results">
+        <div class="empty-state" style="padding:40px">
+          <i class="ti ti-search"></i>
+          <h3>Start typing to search</h3>
+          <p>Search across all your interview questions, answers, and profile.</p>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// UPCOMING PAGE
+// ════════════════════════════════════════
+function renderUpcoming() {
+  const preps = DB.getAll('preps');
+  const interviews = DB.getAll('interviews');
+  const upcoming = preps.filter(p => {
+    const hasInterview = interviews.some(iv => iv.companyId === p.id);
+    return !hasInterview || interviews.filter(iv => iv.companyId === p.id).every(iv => iv.status === 'pending' || iv.status === 'advanced');
+  });
+
+  if (upcoming.length === 0) {
+    return `
+      <div class="topbar"><div class="topbar-title">Upcoming interviews</div></div>
+      <div class="page-content">
+        <div class="empty-state">
+          <i class="ti ti-calendar-up"></i>
+          <h3>No upcoming interviews</h3>
+          <p>Create an interview prep for an upcoming interview.</p>
+          <div style="margin-top:16px">
+            <button class="btn btn-primary" onclick="navigate('prep')"><i class="ti ti-plus"></i> Create prep</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="topbar"><div><div class="topbar-title">Upcoming interviews</div><div class="topbar-sub">${upcoming.length} prep${upcoming.length!==1?'s':''} ready</div></div></div>
+    <div class="page-content">
+      ${upcoming.map(p => `
+        <div class="card" style="margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="navigate('prep')">
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:500;color:var(--text)">${p.company}</div>
+            <div style="font-size:12px;color:var(--text3)">${p.role}</div>
+          </div>
+          <span class="tag tag-green">Round ${getNextRound(p.id)}</span>
+          <button class="btn btn-primary" onclick="event.stopPropagation();selectPrep('${p.id}');navigate('new-interview')">
+            <i class="ti ti-file-plus"></i> Add interview
+          </button>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+// ════════════════════════════════════════
+// AI ANALYSIS via Anthropic API
+// ════════════════════════════════════════
+async function callClaude(prompt, systemPrompt = '') {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt || 'You are an interview coach. Respond only in valid JSON.',
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  const data = await response.json();
+  return data.content?.[0]?.text || '';
+}
+
+async function analyzeInterview() {
+  const preps = DB.getAll('preps');
+  const prep = preps.find(p => p.id === niSelectedPrep);
+  if (!niUploadedTranscript || !prep) return;
+
+  const interviews = DB.getAll('interviews');
+  const companyId = niSelectedPrep;
+  const roundIndex = getNextRound(companyId) - 1;
+
+  // Get interviewer info
+  const interviewers = Array.from(document.querySelectorAll('.ni-interviewer-name')).map((el, i) => ({
+    name: el.value,
+    linkedin: document.querySelectorAll('.ni-interviewer-li')[i]?.value || ''
+  })).filter(iv => iv.name);
+
+  const date = document.getElementById('ni-date')?.value || '';
+  const selectedStatus = document.querySelector('.ni-status-selected')?.dataset?.status || 'pending';
+
+  // Show loading state
+  const container = document.getElementById('page-container');
+  container.innerHTML = `
+    <div class="topbar"><div class="topbar-title">Analyzing ${prep.company} · Round ${roundIndex+1}…</div></div>
+    <div class="page-content">
+      <div class="analysis-loading">
+        <div class="spinner"></div>
+        <p>Reading your transcript and generating analysis…</p>
+        <p style="font-size:12px;color:var(--text3)">This takes about 20–30 seconds</p>
+      </div>
+    </div>`;
+
+  try {
+    const transcriptText = niUploadedTranscript.content;
+    const prevInterviews = interviews.filter(iv => iv.companyId === companyId);
+    const prevContext = prevInterviews.length > 0
+      ? `\n\nPrevious round context:\n${prevInterviews.map(iv => `Round ${(iv.roundIndex||0)+1} scores: ${JSON.stringify(iv.scores||{})}\nRound ${(iv.roundIndex||0)+1} feedback: ${JSON.stringify(iv.analysis?.patterns||[])}`).join('\n')}`
+      : '';
+
+    const prompt = `Analyze this job interview transcript for ${prep.company} (${prep.role}).
+
+Job Description: ${prep.jobDescription || 'Not provided'}
+
+Interview Transcript:
+${transcriptText}
+${prevContext}
+
+Return ONLY valid JSON (no markdown) with this exact structure:
+{
+  "scores": {
+    "conciseness": <1-10>,
+    "metricsUse": <1-10>,
+    "alignment": <1-10>,
+    "directorFraming": <1-10>,
+    "questionAnswered": <1-10>,
+    "businessFraming": <1-10>
+  },
+  "analysis": {
+    "summary": "<2-3 sentence overall summary>",
+    "avgAnswerLength": "<estimated avg e.g. 2m 30s>",
+    "patterns": [
+      {"type": "warn|good|info", "text": "<pattern observed>"}
+    ]
+  },
+  "questions": [
+    {
+      "text": "<question asked>",
+      "myAnswer": "<brief summary of answer>",
+      "flag": "<ran long|no metric|off-topic or null>",
+      "good": "<strong|concise or null>",
+      "feedback": "<1 sentence coaching note>"
+    }
+  ]
+}`;
+
+    const raw = await callClaude(prompt);
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(clean);
+
+    // Save interview
+    const newInterview = {
+      id: 'iv_' + Date.now(),
+      companyId,
+      company: prep.company,
+      role: prep.role,
+      roundIndex,
+      date,
+      interviewers,
+      status: currentNIStatus || 'pending',
+      jobDescription: prep.jobDescription || '',
+      transcript: transcriptText,
+      scores: result.scores,
+      analysis: result.analysis,
+      questions: result.questions,
+    };
+
+    const allInterviews = DB.getAll('interviews');
+    allInterviews.push(newInterview);
+    DB.set('interviews', allInterviews);
+
+    niState = 'landing';
+    niSelectedPrep = null;
+    niUploadedTranscript = null;
+    currentNIStatus = 'pending';
+
+    navigate('company', { companyId, roundIndex: roundIndex });
+    currentCompanyTab = 'retrospective';
+    renderPage();
+    showToast('Interview analyzed and saved ✓');
+
+  } catch(err) {
+    console.error(err);
+    container.innerHTML = `
+      <div class="topbar"><div class="topbar-title">Analysis failed</div></div>
+      <div class="page-content">
+        <div class="empty-state">
+          <i class="ti ti-alert-triangle"></i>
+          <h3>Something went wrong</h3>
+          <p>${err.message}</p>
+          <button class="btn" onclick="navigate('new-interview')" style="margin-top:14px">Try again</button>
+        </div>
+      </div>`;
+  }
+}
+
+async function analyzeInterviewUpload() {
+  if (!niUploadedTranscript) return;
+  const company = document.getElementById('ni-upload-company')?.value || 'Unknown';
+  const role = document.getElementById('ni-upload-role')?.value || '';
+  const date = document.getElementById('ni-upload-date')?.value || '';
+  const companyId = 'co_' + Date.now();
+
+  const container = document.getElementById('page-container');
+  container.innerHTML = `
+    <div class="topbar"><div class="topbar-title">Analyzing ${company}…</div></div>
+    <div class="page-content"><div class="analysis-loading"><div class="spinner"></div><p>Analyzing your interview…</p></div></div>`;
+
+  try {
+    const prompt = `Analyze this job interview transcript for ${company} (${role}).
+${niUploadedJD ? 'Job Description: ' + niUploadedJD.content : ''}
+Transcript: ${niUploadedTranscript.content}
+
+Return ONLY valid JSON with:
+{
+  "scores": {"conciseness":<1-10>,"metricsUse":<1-10>,"alignment":<1-10>,"directorFraming":<1-10>,"questionAnswered":<1-10>,"businessFraming":<1-10>},
+  "analysis": {"summary":"<text>","avgAnswerLength":"<e.g. 2m 30s>","patterns":[{"type":"warn|good|info","text":"<text>"}]},
+  "questions": [{"text":"<q>","myAnswer":"<summary>","flag":"<ran long|no metric|null>","good":"<strong|null>","feedback":"<text>"}]
+}`;
+
+    const raw = await callClaude(prompt);
+    const result = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    const newInterview = {
+      id: 'iv_' + Date.now(),
+      companyId,
+      company,
+      role,
+      roundIndex: 0,
+      date,
+      interviewers: [],
+      status: currentNIStatus || 'pending',
+      jobDescription: niUploadedJD?.content || '',
+      transcript: niUploadedTranscript.content,
+      scores: result.scores,
+      analysis: result.analysis,
+      questions: result.questions,
+    };
+
+    const all = DB.getAll('interviews');
+    all.push(newInterview);
+    DB.set('interviews', all);
+
+    niState = 'landing';
+    niUploadedTranscript = null;
+    niUploadedJD = null;
+    currentNIStatus = 'pending';
+
+    navigate('company', { companyId });
+    currentCompanyTab = 'retrospective';
+    renderPage();
+    showToast('Interview analyzed and saved ✓');
+  } catch(err) {
+    container.innerHTML = `<div class="topbar"><div class="topbar-title">Error</div></div><div class="page-content"><div class="empty-state"><i class="ti ti-alert-triangle"></i><h3>Analysis failed</h3><p>${err.message}</p><button class="btn" onclick="navigate('new-interview')" style="margin-top:14px">Try again</button></div></div>`;
+  }
+}
+
+async function generatePrepBrief() {
+  const jd = document.getElementById('jd-text')?.value || '';
+  const company = document.getElementById('prep-company')?.value || '';
+  const role = document.getElementById('prep-role')?.value || '';
+
+  if (!jd && !company) { showToast('Add a job description or company name first'); return; }
+
+  const companies = DB.getAll('profile-companies');
+  const profileSummary = companies.map(co =>
+    `${co.name} (${co.title}): ${co.summary || ''}\nProjects: ${(co.projects||[]).map(p=>p.name+': '+p.story).join('; ')}`
+  ).join('\n\n');
+
+  const container = document.getElementById('prep-tab-content');
+  if (container) container.innerHTML = `<div class="analysis-loading"><div class="spinner"></div><p>Generating your brief…</p></div>`;
+
+  try {
+    const prompt = `Create an interview prep brief for ${company || 'this company'} - ${role}.
+
+Job Description: ${jd || 'Not provided'}
+
+Candidate Profile:
+${profileSummary || 'No profile added yet'}
+
+Return ONLY valid JSON:
+{
+  "about": "<tailored 2-3 sentence about me for this specific role, written in first person, ending with a clear stop>",
+  "questions": ["<question 1 to ask them>","<question 2>","<question 3>","<question 4>","<question 5>"],
+  "projects": ["<project name at company that is most relevant>","<second most relevant>"]
+}`;
+
+    const raw = await callClaude(prompt);
+    const result = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    const prepData = {
+      id: 'prep_' + (company || Date.now()).replace(/\s/g,'_').toLowerCase() + '_' + Date.now(),
+      company: company || 'Unknown',
+      role: role || '',
+      jobDescription: jd,
+      about: result.about,
+      questions: result.questions,
+      projects: result.projects,
+      createdAt: new Date().toISOString(),
+    };
+
+    DB.set('current-prep', prepData);
+
+    const preps = DB.getAll('preps');
+    const existingIdx = preps.findIndex(p => p.id === prepData.id);
+    if (existingIdx >= 0) preps[existingIdx] = prepData;
+    else preps.push(prepData);
+    DB.set('preps', preps);
+
+    currentPrepTab = 'about';
+    renderPage();
+    showToast('Brief generated ✓');
+  } catch(err) {
+    if (container) container.innerHTML = `<div class="empty-state"><i class="ti ti-alert-triangle"></i><h3>Generation failed</h3><p>${err.message}</p></div>`;
+  }
+}
+
+async function runAnalysisOnExisting() {
+  const interviews = DB.getAll('interviews').filter(iv => iv.companyId === currentCompanyId);
+  const iv = interviews[currentRoundIndex];
+  if (!iv || !iv.transcript) return;
+
+  niUploadedTranscript = { content: iv.transcript, name: 'existing' };
+  niSelectedPrep = currentCompanyId;
+
+  // Create temp prep if not exists
+  const preps = DB.getAll('preps');
+  if (!preps.find(p => p.id === currentCompanyId)) {
+    preps.push({ id: currentCompanyId, company: iv.company, role: iv.role, jobDescription: iv.jobDescription || '' });
+    DB.set('preps', preps);
+  }
+
+  await analyzeInterview();
+}
+
+// ════════════════════════════════════════
+// BIND PAGE EVENTS
+// ════════════════════════════════════════
+let currentNIStatus = 'pending';
+let searchFilter = 'all';
+
+function bindPageEvents() {}
+
+function setProfileTab(tab) { currentProfileTab = tab; renderPage(); }
+function setPrepTab(tab) { currentPrepTab = tab; renderPage(); }
+function setCompanyTab(tab) { currentCompanyTab = tab; renderPage(); }
+function setRound(idx) { currentRoundIndex = idx; renderPage(); }
+
+function selectNIMode(mode) {
+  if (mode === 'prep') {
+    niState = 'landing';
+  } else {
+    niState = 'upload';
+  }
+  niUploadedTranscript = null;
+  niUploadedJD = null;
+  renderPage();
+}
+
+function selectPrep(prepId) {
+  niSelectedPrep = prepId;
+  niState = 'prep-selected';
+  niUploadedTranscript = null;
+  renderPage();
+}
+
+function resetNI() {
+  niState = 'landing';
+  niSelectedPrep = null;
+  niUploadedTranscript = null;
+  niUploadedJD = null;
+  renderPage();
+}
+
+function selectNIStatus(status) {
+  currentNIStatus = status;
+  document.querySelectorAll('[id^="ni-status-"]').forEach(el => {
+    el.classList.remove('tag-amber','tag-green','tag-purple','tag-teal');
+    el.style.background = '';
+    el.style.color = '';
+    el.style.borderColor = '';
+  });
+  const el = document.getElementById('ni-status-' + status);
+  if (el) {
+    const colors = {
+      'pending':'tag-amber','advanced':'tag-green','offer':'tag-purple','withdrew':''
+    };
+    el.classList.add(colors[status] || 'tag-teal');
+    el.dataset.status = status;
+  }
+}
+
+function addInterviewerRow() {
+  const list = document.getElementById('interviewers-list');
+  if (!list) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px';
+  row.innerHTML = `<input type="text" placeholder="Name · title" style="flex:1;font-size:12px" class="ni-interviewer-name"><input type="text" placeholder="linkedin.com/in/…" style="width:160px;font-size:12px" class="ni-interviewer-li">`;
+  list.appendChild(row);
+}
+
+function addInterviewerRowUpload() {
+  const list = document.getElementById('upload-interviewers-list');
+  if (!list) return;
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px';
+  row.innerHTML = `<input type="text" placeholder="Name · title" style="flex:1;font-size:12px" class="ni-interviewer-name"><input type="text" placeholder="linkedin.com/in/…" style="width:160px;font-size:12px" class="ni-interviewer-li">`;
+  list.appendChild(row);
+}
+
+function triggerFileUpload(inputId) {
+  document.getElementById(inputId)?.click();
+}
+
+function handleNITranscript(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    niUploadedTranscript = { name: file.name, content: e.target.result };
+    renderPage();
+  };
+  reader.readAsText(file);
+}
+
+function handleNITranscriptUpload(event) {
+  handleNITranscript(event);
+}
+
+function handleNIJD(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    niUploadedJD = { name: file.name, content: e.target.result };
+    renderPage();
+  };
+  reader.readAsText(file);
+}
+
+function handleJDUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const el = document.getElementById('jd-text');
+    if (el) el.value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+function updatePrepJD() {}
+
+function saveInterviewOnly() {
+  const preps = DB.getAll('preps');
+  const prep = preps.find(p => p.id === niSelectedPrep);
+  if (!prep) return;
+
+  const companyId = niSelectedPrep;
+  const roundIndex = getNextRound(companyId) - 1;
+  const date = document.getElementById('ni-date')?.value || '';
+
+  const newInterview = {
+    id: 'iv_' + Date.now(),
+    companyId,
+    company: prep.company,
+    role: prep.role,
+    roundIndex,
+    date,
+    interviewers: [],
+    status: currentNIStatus || 'pending',
+    jobDescription: prep.jobDescription || '',
+    transcript: niUploadedTranscript?.content || '',
+  };
+
+  const all = DB.getAll('interviews');
+  all.push(newInterview);
+  DB.set('interviews', all);
+
+  niState = 'landing';
+  niSelectedPrep = null;
+  niUploadedTranscript = null;
+  navigate('company', { companyId });
+  showToast('Interview saved ✓');
+}
+
+function setStatus(interviewId, status) {
+  const interviews = DB.getAll('interviews');
+  const idx = interviews.findIndex(iv => iv.id === interviewId);
+  if (idx >= 0) {
+    interviews[idx].status = status;
+    DB.set('interviews', interviews);
+  }
+  document.querySelectorAll('.status-dropdown-menu').forEach(el => el.classList.remove('open'));
+  renderPage();
+}
+
+function toggleStatusDropdown(interviewId) {
+  const dd = document.getElementById('status-dropdown-' + interviewId);
+  if (dd) dd.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.status-dropdown-wrap')) {
+    document.querySelectorAll('.status-dropdown-menu').forEach(el => el.classList.remove('open'));
+  }
+});
+
+function toggleEditAbout(id) {
+  const display = document.getElementById('about-display-' + id);
+  const edit = document.getElementById('about-edit-' + id);
+  if (!display || !edit) return;
+  display.classList.toggle('hidden');
+  edit.classList.toggle('hidden');
+}
+
+function saveAbout(id, question) {
+  const textarea = document.getElementById('about-textarea-' + id);
+  if (!textarea) return;
+  const answer = textarea.value;
+
+  const prompts = DB.getAll('about-prompts');
+  const idx = prompts.findIndex(p => p.id === id);
+  if (idx >= 0) prompts[idx].answer = answer;
+  else prompts.push({ id, question, answer });
+  DB.set('about-prompts', prompts);
+
+  toggleEditAbout(id);
+  renderPage();
+  showToast('Saved ✓');
+}
+
+function removeFavorite(id) {
+  const favs = DB.getAll('favorites').filter(f => f.id !== id);
+  DB.set('favorites', favs);
+  renderPage();
+}
+
+function favoriteQA(interviewId, question, answer, company, date) {
+  const favs = DB.getAll('favorites');
+  const id = 'fav_' + Date.now();
+  favs.push({ id, question, answer, company, date });
+  DB.set('favorites', favs);
+  showToast('Added to favorites ✓');
+  renderPage();
+}
+
+// MODALS
+function openAddCompanyModal() {
+  const content = `
+    <div class="modal-title">Add company <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Company name</label><input type="text" id="m-co-name" placeholder="e.g. Acme Corp"></div>
+      <div><label>Your title</label><input type="text" id="m-co-title" placeholder="e.g. Senior Product Designer"></div>
+      <div><label>Dates</label><input type="text" id="m-co-dates" placeholder="e.g. 2021 – 2024"></div>
+      <div><label>Industry</label><input type="text" id="m-co-industry" placeholder="e.g. B2B SaaS"></div>
+      <div><label>Summary</label><textarea id="m-co-summary" placeholder="Brief description of your role…" style="height:80px;resize:vertical"></textarea></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-primary" onclick="saveCompany()">Add company</button>
+        <button class="btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>`;
+  openModal(content);
+}
+
+function openEditCompanyModal(id) {
+  const companies = DB.getAll('profile-companies');
+  const co = companies.find(c => c.id === id);
+  if (!co) return;
+  const content = `
+    <div class="modal-title">Edit ${co.name} <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Company name</label><input type="text" id="m-co-name" value="${co.name}"></div>
+      <div><label>Your title</label><input type="text" id="m-co-title" value="${co.title||''}"></div>
+      <div><label>Dates</label><input type="text" id="m-co-dates" value="${co.dates||''}"></div>
+      <div><label>Industry</label><input type="text" id="m-co-industry" value="${co.industry||''}"></div>
+      <div><label>Summary</label><textarea id="m-co-summary" style="height:80px;resize:vertical">${co.summary||''}</textarea></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-primary" onclick="saveCompany('${id}')">Save</button>
+        <button class="btn" onclick="closeModal()">Cancel</button>
+        <button class="btn" style="margin-left:auto;color:var(--red)" onclick="deleteCompany('${id}')"><i class="ti ti-trash"></i></button>
+      </div>
+    </div>`;
+  openModal(content);
+}
+
+function saveCompany(existingId) {
+  const name = document.getElementById('m-co-name')?.value?.trim();
+  if (!name) return;
+  const co = {
+    id: existingId || 'co_' + Date.now(),
+    name,
+    title: document.getElementById('m-co-title')?.value || '',
+    dates: document.getElementById('m-co-dates')?.value || '',
+    industry: document.getElementById('m-co-industry')?.value || '',
+    summary: document.getElementById('m-co-summary')?.value || '',
+    projects: existingId ? (DB.getAll('profile-companies').find(c=>c.id===existingId)?.projects||[]) : [],
+  };
+  const companies = DB.getAll('profile-companies');
+  if (existingId) {
+    const idx = companies.findIndex(c => c.id === existingId);
+    if (idx >= 0) companies[idx] = co;
+  } else {
+    companies.push(co);
+  }
+  DB.set('profile-companies', companies);
+  closeModal();
+  renderPage();
+  showToast('Company saved ✓');
+}
+
+function deleteCompany(id) {
+  const companies = DB.getAll('profile-companies').filter(c => c.id !== id);
+  DB.set('profile-companies', companies);
+  closeModal();
+  renderPage();
+}
+
+function openAddProjectModal(companyId) {
+  const content = `
+    <div class="modal-title">Add project <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Project name</label><input type="text" id="m-proj-name" placeholder="e.g. Mobile design system consolidation"></div>
+      <div><label>Key metric</label><input type="text" id="m-proj-metric" placeholder="e.g. ↓ 40% handoff cycles"></div>
+      <div><label>Story</label><textarea id="m-proj-story" placeholder="What was the problem, what did you do, what was the outcome?" style="height:100px;resize:vertical"></textarea></div>
+      <div><label>Tags <span style="font-weight:400;text-transform:none;letter-spacing:0">(comma separated)</span></label><input type="text" id="m-proj-tags" placeholder="design systems, cross-functional, ROI story"></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-primary" onclick="saveProject('${companyId}')">Add project</button>
+        <button class="btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>`;
+  openModal(content);
+}
+
+function saveProject(companyId) {
+  const name = document.getElementById('m-proj-name')?.value?.trim();
+  if (!name) return;
+  const proj = {
+    name,
+    metric: document.getElementById('m-proj-metric')?.value || '',
+    story: document.getElementById('m-proj-story')?.value || '',
+    tags: (document.getElementById('m-proj-tags')?.value || '').split(',').map(t=>t.trim()).filter(Boolean),
+  };
+  const companies = DB.getAll('profile-companies');
+  const idx = companies.findIndex(c => c.id === companyId);
+  if (idx >= 0) {
+    companies[idx].projects = companies[idx].projects || [];
+    companies[idx].projects.push(proj);
+    DB.set('profile-companies', companies);
+  }
+  closeModal();
+  renderPage();
+  showToast('Project added ✓');
+}
+
+function openAddPromptModal() {
+  const content = `
+    <div class="modal-title">Add a prompt <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label>Question / prompt</label><input type="text" id="m-prompt-q" placeholder="e.g. How I prioritize competing demands"></div>
+      <div><label>Your answer</label><textarea id="m-prompt-a" placeholder="Write your answer…" style="height:100px;resize:vertical"></textarea></div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-primary" onclick="savePrompt()">Add</button>
+        <button class="btn" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>`;
+  openModal(content);
+}
+
+function savePrompt() {
+  const q = document.getElementById('m-prompt-q')?.value?.trim();
+  if (!q) return;
+  const prompts = DB.getAll('about-prompts');
+  prompts.push({ id: 'p_' + Date.now(), question: q, answer: document.getElementById('m-prompt-a')?.value || '' });
+  DB.set('about-prompts', prompts);
+  closeModal();
+  renderPage();
+  showToast('Prompt added ✓');
+}
+
+function loadPrep(id) {
+  const preps = DB.getAll('preps');
+  const prep = preps.find(p => p.id === id);
+  if (!prep) return;
+  DB.set('current-prep', prep);
+  renderPage();
+}
+
+function runSearch() {
+  const query = document.getElementById('search-input')?.value?.toLowerCase() || '';
+  const resultsEl = document.getElementById('search-results');
+  if (!resultsEl) return;
+  if (!query) {
+    resultsEl.innerHTML = `<div class="empty-state" style="padding:40px"><i class="ti ti-search"></i><h3>Start typing to search</h3><p>Search across all your interview questions, answers, and profile.</p></div>`;
+    return;
+  }
+
+  const results = [];
+  const interviews = DB.getAll('interviews');
+  interviews.forEach(iv => {
+    (iv.questions||[]).forEach(q => {
+      if ((q.text||'').toLowerCase().includes(query) || (q.myAnswer||'').toLowerCase().includes(query)) {
+        results.push({ type: 'question', company: iv.company, date: iv.date, question: q.text, answer: q.myAnswer });
+      }
+    });
+  });
+
+  const companies = DB.getAll('profile-companies');
+  companies.forEach(co => {
+    (co.projects||[]).forEach(p => {
+      if ((p.name+' '+(p.story||'')).toLowerCase().includes(query)) {
+        results.push({ type: 'profile', company: co.name, question: p.name, answer: p.story });
+      }
+    });
+  });
+
+  if (results.length === 0) {
+    resultsEl.innerHTML = `<div class="empty-state" style="padding:40px"><i class="ti ti-search"></i><h3>No results</h3><p>No matches for "${query}"</p></div>`;
+    return;
+  }
+
+  resultsEl.innerHTML = results.map(r => `
+    <div class="card card-sm" style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span class="tag ${r.type==='question'?'tag-purple':'tag-teal'}">${r.type}</span>
+        <span style="font-size:11px;color:var(--text3)">${r.company}${r.date?' · '+r.date:''}</span>
+      </div>
+      <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">${r.question||''}</div>
+      ${r.answer ? `<div style="font-size:12px;color:var(--text2);line-height:1.5">${r.answer}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function setSearchFilter(filter, btn) {
+  searchFilter = filter;
+  document.querySelectorAll('.search-filter').forEach(el => el.classList.remove('active'));
+  btn.classList.add('active');
+  runSearch();
+}
+
+function editPrepAbout() { showToast('Edit mode — modify the text and save.'); }
+function savePrepAbout() {
+  const prep = DB.get('current-prep');
+  if (!prep) return;
+  const preps = DB.getAll('preps');
+  const idx = preps.findIndex(p => p.id === prep.id);
+  if (idx >= 0) { preps[idx] = prep; DB.set('preps', preps); }
+  showToast('Prep saved ✓');
+}
+
+function openModal(content) {
+  document.getElementById('modal-content').innerHTML = content;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(event) {
+  if (event && event.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+navigate('dashboard');
+updateSidebarCompanies();
+</script>
+</body>
+</html>
