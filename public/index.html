@@ -1936,13 +1936,13 @@ function renderUpcoming() {
 // ════════════════════════════════════════
 // AI ANALYSIS via Anthropic API
 // ════════════════════════════════════════
-async function callClaude(prompt, systemPrompt = '') {
+async function callClaude(prompt, systemPrompt = '', maxTokens = 2000) {
   const response = await fetch('/api/claude', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-5',
-      max_tokens: 2000,
+      max_tokens: maxTokens,
       system: systemPrompt || 'You are an interview coach. Respond only in valid JSON.',
       messages: [{ role: 'user', content: prompt }]
     })
@@ -2568,9 +2568,29 @@ function openImportModal() {
   openModal(content);
 }
 
+function deduplicateLinkedIn(text) {
+  // LinkedIn pastes each paragraph twice. Split on newlines, keep only first occurrence of each chunk.
+  const lines = text.split('\n');
+  const seen = new Set();
+  const deduped = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) { deduped.push(''); continue; }
+    if (!seen.has(trimmed)) {
+      seen.add(trimmed);
+      deduped.push(line);
+    }
+  }
+  return deduped.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
 async function parseLinkedInBio() {
-  const text = document.getElementById('import-bio-text')?.value?.trim();
-  if (!text) { showToast('Paste some text first'); return; }
+  const rawText = document.getElementById('import-bio-text')?.value?.trim();
+  if (!rawText) { showToast('Paste some text first'); return; }
+
+  // LinkedIn duplicates every paragraph — deduplicate by splitting into sentences
+  // and removing consecutive duplicates, then rejoin
+  const text = deduplicateLinkedIn(rawText);
 
   // Show loading inside modal
   document.getElementById('modal-content').innerHTML = `
@@ -2607,7 +2627,7 @@ Return ONLY valid JSON — an array of companies:
 Text to parse:
 ${text}`;
 
-    const raw = await callClaude(prompt);
+    const raw = await callClaude(prompt, '', 6000);
     const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
 
     if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No companies found');
