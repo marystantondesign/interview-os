@@ -588,9 +588,9 @@
     background: var(--surface);
     border-radius: var(--radius-lg);
     padding: 24px;
-    width: 480px;
-    max-width: 90vw;
-    max-height: 80vh;
+    width: 560px;
+    max-width: 92vw;
+    max-height: 86vh;
     overflow-y: auto;
     transform: translateY(8px);
     transition: transform 0.2s;
@@ -1032,15 +1032,17 @@ function renderCareerHistory() {
       <div class="empty-state">
         <i class="ti ti-building"></i>
         <h3>No companies yet</h3>
-        <p>Add the companies you've worked at to build your career history.</p>
-        <div style="margin-top:16px">
-          <button class="btn btn-primary" onclick="openAddCompanyModal()"><i class="ti ti-plus"></i> Add a company</button>
+        <p>Add companies manually or paste your LinkedIn bio and let Claude do it for you.</p>
+        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center">
+          <button class="btn btn-primary" onclick="openImportModal()"><i class="ti ti-brand-linkedin"></i> Import from LinkedIn or paste bio</button>
+          <button class="btn" onclick="openAddCompanyModal()"><i class="ti ti-plus"></i> Add manually</button>
         </div>
       </div>`;
   }
 
   return `
-    <div style="display:flex;justify-content:flex-end;margin-bottom:14px">
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">
+      <button class="btn" onclick="openImportModal()"><i class="ti ti-brand-linkedin"></i> Import from LinkedIn or paste bio</button>
       <button class="btn btn-primary" onclick="openAddCompanyModal()"><i class="ti ti-plus"></i> Add company</button>
     </div>
     ${companies.map(co => renderCompanyBlock(co)).join('')}`;
@@ -2544,6 +2546,141 @@ function favoriteQA(interviewId, question, answer, company, date) {
   DB.set('favorites', favs);
   showToast('Added to favorites ✓');
   renderPage();
+}
+
+// ════════════════════════════════════════
+// LINKEDIN IMPORT
+// ════════════════════════════════════════
+function openImportModal() {
+  const content = `
+    <div class="modal-title">
+      Import career history
+      <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button>
+    </div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.6">
+      Paste your LinkedIn bio, resume text, or just a brain dump. Claude will pull out your companies, roles, dates, and key projects automatically.
+    </div>
+    <textarea id="import-bio-text" placeholder="Paste your LinkedIn Experience section, resume, or anything describing your work history…" style="height:220px;resize:vertical;font-size:12px;line-height:1.6"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary" onclick="parseLinkedInBio()"><i class="ti ti-sparkles"></i> Parse with Claude</button>
+      <button class="btn" onclick="closeModal()">Cancel</button>
+    </div>`;
+  openModal(content);
+}
+
+async function parseLinkedInBio() {
+  const text = document.getElementById('import-bio-text')?.value?.trim();
+  if (!text) { showToast('Paste some text first'); return; }
+
+  // Show loading inside modal
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-title">Parsing your career history…</div>
+    <div class="analysis-loading" style="padding:32px 0">
+      <div class="spinner"></div>
+      <p>Claude is reading your experience…</p>
+    </div>`;
+
+  try {
+    const prompt = `You are parsing a designer's LinkedIn profile or resume into structured data.
+
+Extract every job/role from the text below. For each one, also extract 1–3 key projects or achievements that would be worth talking about in a job interview — focus on things with measurable outcomes, leadership moments, or notable scope.
+
+Return ONLY valid JSON — an array of companies:
+[
+  {
+    "name": "<company name>",
+    "title": "<job title>",
+    "dates": "<e.g. 2021 – 2023>",
+    "industry": "<1–3 word industry label, e.g. B2B SaaS, Fintech, Nonprofit>",
+    "summary": "<2–3 sentence summary of their role and impact, written in third person, clean and punchy>",
+    "projects": [
+      {
+        "name": "<short project or achievement name>",
+        "metric": "<key metric or outcome if mentioned, e.g. '4/5 users reported improvement' — null if none>",
+        "story": "<1–2 sentence description of what the problem was, what they did, and what happened>",
+        "tags": ["<relevant tag>", "<tag>"]
+      }
+    ]
+  }
+]
+
+Text to parse:
+${text}`;
+
+    const raw = await callClaude(prompt);
+    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+
+    if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No companies found');
+
+    // Show preview
+    document.getElementById('modal-content').innerHTML = `
+      <div class="modal-title">
+        Review before importing
+        <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
+        Found <strong>${parsed.length} companies</strong>. Review below, then click Import.
+      </div>
+      <div style="max-height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+        ${parsed.map((co, i) => `
+          <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <div style="font-size:13px;font-weight:500;color:var(--text)">${co.name}</div>
+              <span class="tag">${co.dates || ''}</span>
+            </div>
+            <div style="font-size:12px;color:var(--text3);margin-bottom:6px">${co.title}${co.industry ? ' · ' + co.industry : ''}</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px">${co.summary || ''}</div>
+            ${(co.projects || []).length > 0 ? `
+              <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px">${co.projects.length} project${co.projects.length > 1 ? 's' : ''} extracted</div>
+              ${co.projects.map(p => `
+                <div style="font-size:12px;color:var(--text2);padding:4px 0;border-top:1px solid var(--border);display:flex;align-items:baseline;gap:6px">
+                  <span style="font-weight:500;color:var(--text)">${p.name}</span>
+                  ${p.metric ? `<span style="color:var(--green);font-size:11px">${p.metric}</span>` : ''}
+                </div>`).join('')}
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary" onclick='confirmImport(${JSON.stringify(parsed).replace(/'/g,"&#39;")})'>
+          <i class="ti ti-check"></i> Import ${parsed.length} companies
+        </button>
+        <button class="btn" onclick="openImportModal()"><i class="ti ti-arrow-left"></i> Back</button>
+      </div>`;
+
+  } catch(err) {
+    document.getElementById('modal-content').innerHTML = `
+      <div class="modal-title">Parsing failed <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 8px"><i class="ti ti-x"></i></button></div>
+      <div style="color:var(--red);font-size:13px;margin-bottom:14px">${err.message}</div>
+      <button class="btn" onclick="openImportModal()"><i class="ti ti-arrow-left"></i> Try again</button>`;
+  }
+}
+
+function confirmImport(parsed) {
+  const existing = DB.getAll('profile-companies');
+  const existingNames = existing.map(c => c.name.toLowerCase());
+
+  const toAdd = parsed.filter(co => !existingNames.includes(co.name.toLowerCase()));
+  const newCompanies = toAdd.map(co => ({
+    id: 'co_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name: co.name || 'Unknown',
+    title: co.title || '',
+    dates: co.dates || '',
+    industry: co.industry || '',
+    summary: co.summary || '',
+    projects: (co.projects || []).map(p => ({
+      name: p.name || '',
+      metric: p.metric || '',
+      story: p.story || '',
+      tags: p.tags || [],
+    })),
+  }));
+
+  DB.set('profile-companies', [...existing, ...newCompanies]);
+  closeModal();
+  setProfileTab('career');
+  renderPage();
+  showToast(`Imported ${newCompanies.length} companies ✓`);
 }
 
 // MODALS
