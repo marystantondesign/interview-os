@@ -2601,34 +2601,14 @@ async function parseLinkedInBio() {
     </div>`;
 
   try {
-    const prompt = `You are parsing a designer's LinkedIn profile or resume into structured data.
-
-Extract every job/role from the text below. For each one, also extract 1–3 key projects or achievements that would be worth talking about in a job interview — focus on things with measurable outcomes, leadership moments, or notable scope.
-
-Return ONLY valid JSON — an array of companies:
-[
-  {
-    "name": "<company name>",
-    "title": "<job title>",
-    "dates": "<e.g. 2021 – 2023>",
-    "industry": "<1–3 word industry label, e.g. B2B SaaS, Fintech, Nonprofit>",
-    "summary": "<2–3 sentence summary of their role and impact, written in third person, clean and punchy>",
-    "projects": [
-      {
-        "name": "<short project or achievement name>",
-        "metric": "<key metric or outcome if mentioned, e.g. '4/5 users reported improvement' — null if none>",
-        "story": "<1–2 sentence description of what the problem was, what they did, and what happened>",
-        "tags": ["<relevant tag>", "<tag>"]
-      }
-    ]
-  }
-]
-
-Text to parse:
-${text}`;
-
-    const raw = await callClaude(prompt, '', 6000);
-    const parsed = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    const res = await fetch('/api/parse-bio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Parse failed');
+    const parsed = json.companies;
 
     if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No companies found');
 
